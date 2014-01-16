@@ -4,6 +4,17 @@ require 'typhoeus'
 require 'json'
 require 'pry'
 
+# create a simple class to store movie title, year, and id
+class Movie
+    attr_accessor :title, :year, :id
+
+    def initialize(new_title="", new_year="", new_id="")
+      @title = new_title
+      @year = new_year
+      @id = new_id
+    end
+end
+
 
 #
 # Create and display (on get) original movie search page / form
@@ -30,12 +41,12 @@ post '/result' do
   result_hash = JSON.parse(response.body)
 
   movie_list = []
-  result_hash["Search"].each { |h| movie_list.push("#{h["Title"]} - #{h["Year"]}")}
-  # binding.pry
+  result_hash["Search"].each { |h| movie_list << Movie.new(h["Title"], h["Year"], h["imdbID"]) }
+    # binding.pry
 
   # Modify the html output so that a list of movies is provided.
   html_str = "<html><head><title>Movie Search Results</title></head><body><h1>Movie Results</h1>\n<ul>"
-  movie_list.each { |movie| html_str += "<li>#{movie}</li>" }
+  movie_list.each { |movie| html_str += "<li>#{movie.title} - #{movie.year}</li>" }
   html_str += "</ul></body></html>"
 
 end
