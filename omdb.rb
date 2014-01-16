@@ -42,9 +42,8 @@ post '/result' do
 
   movie_list = []
   result_hash["Search"].each { |h| movie_list << Movie.new(h["Title"], h["Year"], h["imdbID"]) }
-    # binding.pry
 
-  # Modify the html output so that a list of movies is provided.
+  # Modify the html output so that a list of movies is provided. (includes a link to each movie's poster, based on id)
   html_str = "<html><head><title>Movie Search Results</title></head><body><h1>Movie Results</h1>\n<ul>"
   movie_list.each { |movie| html_str += "<li><a href='/poster/#{movie.id}'>#{movie.title} - #{movie.year}</a></li>" }
   html_str += "</ul></body></html>"
@@ -53,8 +52,19 @@ end
 
 get '/poster/:imdb_id' do |imdb_id|
   # Make another api call here to get the url of the poster.
+  response = Typhoeus.get("www.omdbapi.com", :params => {:i => imdb_id})
+
+  # store result in a hash, for better parsing
+  result_hash = JSON.parse(response.body)
+
+  # extract the poster URL
+  poster_url = result_hash["Poster"]
+  
+
+  # Display the simple page with the poster
   html_str = "<html><head><title>Movie Poster</title></head><body><h1>Movie Poster</h1>\n"
-  html_str += "<h3>#{imdb_id}</h3>"
+  html_str += "<h3>Movie ID: #{imdb_id}</h3>"
+  html_str += "<img src='#{poster_url}'/><br/>"
   html_str += '<br /><a href="/">New Search</a></body></html>'
 
 end
