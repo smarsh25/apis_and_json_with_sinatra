@@ -43,6 +43,9 @@ post '/result' do
   movie_list = []
   result_hash["Search"].each { |h| movie_list << Movie.new(h["Title"], h["Year"], h["imdbID"]) }
 
+  # sort the movie list, before displaying
+  movie_list.sort! { |x, y| x.year <=> y.year}
+
   # Modify the html output so that a list of movies is provided. (includes a link to each movie's poster, based on id)
   html_str = "<html><head><title>Movie Search Results</title></head><body><h1>Movie Results</h1>\n<ul>"
   movie_list.each { |movie| html_str += "<li><a href='/poster/#{movie.id}'>#{movie.title} - #{movie.year}</a></li>" }
